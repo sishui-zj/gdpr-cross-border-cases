@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>全球数据跨境合规案例库 | Cross-Border Data Compliance Case Database</title>
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --primary: #1a56db;
+    --primary-light: #e8eefb;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --warning: #f59e0b;
+    --warning-light: #fffbeb;
+    --success: #059669;
+    --success-light: #ecfdf5;
+    --info: #6366f1;
+    --info-light: #eef2ff;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -2px rgba(0,0,0,.05);
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #1e3a5f 0%, #1a56db 50%, #3b82f6 100%); color: #fff; padding: 48px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,.05) 0%, transparent 60%); }
+  .header h1 { font-size: 32px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; position: relative; }
+  .header p { font-size: 15px; opacity: .85; position: relative; }
+
+  /* Stats bar */
+  .stats-bar { display: flex; justify-content: center; gap: 32px; padding: 20px 24px; background: var(--card-bg); border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .stat-item { text-align: center; }
+  .stat-number { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .stat-label { font-size: 13px; color: var(--text-secondary); }
+
+  /* Controls */
+  .controls { max-width: 1320px; margin: 24px auto; padding: 0 24px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .search-box { flex: 1; min-width: 260px; position: relative; }
+  .search-box input { width: 100%; padding: 12px 16px 12px 44px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 15px; transition: border-color .2s; background: var(--card-bg); }
+  .search-box input:focus { outline: none; border-color: var(--primary); }
+  .search-box .icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 18px; }
+  .filter-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-select { padding: 10px 14px; border: 2px solid var(--border); border-radius: var(--radius); font-size: 14px; background: var(--card-bg); cursor: pointer; color: var(--text); min-width: 140px; }
+  .filter-select:focus { outline: none; border-color: var(--primary); }
+
+  /* Sort controls */
+  .sort-bar { max-width: 1320px; margin: 0 auto 16px; padding: 0 24px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-secondary); flex-wrap: wrap; }
+  .sort-btn { padding: 5px 12px; border: 1px solid var(--border); border-radius: 20px; background: var(--card-bg); cursor: pointer; font-size: 13px; transition: all .2s; color: var(--text-secondary); }
+  .sort-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .sort-btn:hover { border-color: var(--primary); }
+  .result-count { margin-left: auto; }
+
+  /* Cards grid */
+  .cards { max-width: 1320px; margin: 0 auto; padding: 0 24px 48px; display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 20px; }
+  @media (max-width: 500px) { .cards { grid-template-columns: 1fr; } }
+
+  .card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; transition: transform .2s, box-shadow .2s; cursor: pointer; border: 1px solid var(--border); }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .card-top { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .card-company { font-size: 20px; font-weight: 700; color: var(--text); }
+  .card-fine { font-size: 18px; font-weight: 700; white-space: nowrap; }
+  .fine-high { color: var(--danger); }
+  .fine-mid { color: var(--warning); }
+  .fine-low { color: var(--text-secondary); }
+
+  .card-body { padding: 12px 20px 16px; }
+  .card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .tag-country { background: var(--primary-light); color: var(--primary); }
+  .tag-dest { background: var(--danger-light); color: var(--danger); }
+  .tag-status-closed { background: var(--success-light); color: var(--success); }
+  .tag-status-appealing { background: var(--warning-light); color: #b45309; }
+  .tag-status-pending { background: var(--info-light); color: var(--info); }
+  .tag-status-investigating { background: #fdf4ff; color: #9333ea; }
+  .tag-risk-high { background: var(--danger-light); color: var(--danger); }
+  .tag-risk-mid { background: var(--warning-light); color: #b45309; }
+  .tag-risk-low { background: var(--success-light); color: var(--success); }
+  .tag-industry { background: #f0fdf4; color: #15803d; }
+
+  .card-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.7; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .card-footer { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-secondary); }
+  .card-date { display: flex; align-items: center; gap: 4px; }
+  .card-link a { color: var(--primary); text-decoration: none; font-weight: 500; }
+  .card-link a:hover { text-decoration: underline; }
+
+  /* Modal overlay */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 1000; justify-content: center; align-items: center; padding: 24px; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--card-bg); border-radius: var(--radius); max-width: 780px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg); }
+  .modal-header { padding: 24px 28px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+  .modal-header h2 { font-size: 24px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-secondary); padding: 0 4px; line-height: 1; }
+  .modal-close:hover { color: var(--text); }
+  .modal-body { padding: 20px 28px 28px; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h3 { font-size: 15px; font-weight: 600; color: var(--primary); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--primary-light); }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+  .detail-item label { font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 2px; }
+  .detail-item span { font-size: 15px; font-weight: 500; }
+  .detail-text { font-size: 14px; line-height: 1.8; color: var(--text); }
+  .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .insight-box { background: var(--warning-light); border-left: 4px solid var(--warning); padding: 14px 16px; border-radius: 0 8px 8px 0; font-size: 14px; line-height: 1.7; }
+
+  /* No results */
+  .no-results { text-align: center; padding: 80px 24px; color: var(--text-secondary); }
+  .no-results .icon { font-size: 48px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Global Cross-Border Data Compliance Case Database</h1>
+  <p>全球数据跨境合规执法案例库 — 收录因违反跨境数据传输规定被处罚的公开案例</p>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="controls">
+  <div class="search-box">
+    <span class="icon">&#128269;</span>
+    <input type="text" id="searchInput" placeholder="搜索企业名称、国家、违规描述..." />
+  </div>
+  <div class="filter-group">
+    <select class="filter-select" id="filterDest">
+      <option value="">所有传输目的地</option>
+    </select>
+    <select class="filter-select" id="filterRegulator">
+      <option value="">所有监管国家</option>
+    </select>
+    <select class="filter-select" id="filterStatus">
+      <option value="">所有状态</option>
+      <option value="已执行">已执行</option>
+      <option value="上诉中">上诉中</option>
+      <option value="调查中">调查中</option>
+      <option value="投诉待审">投诉待审</option>
+    </select>
+    <select class="filter-select" id="filterRisk">
+      <option value="">所有风险等级</option>
+      <option value="高">高风险</option>
+      <option value="中">中风险</option>
+      <option value="低">低风险</option>
+    </select>
+    <select class="filter-select" id="filterIndustry">
+      <option value="">所有行业</option>
+    </select>
+  </div>
+</div>
+
+<div class="sort-bar">
+  <span>排序：</span>
+  <button class="sort-btn active" data-sort="date">时间</button>
+  <button class="sort-btn" data-sort="fine">罚款金额</button>
+  <button class="sort-btn" data-sort="company">企业名称</button>
+  <span class="result-count" id="resultCount"></span>
+</div>
+
+<div class="cards" id="cardsContainer"></div>
+<div class="no-results" id="noResults" style="display:none;">
+  <div class="icon">&#128270;</div>
+  <p>未找到匹配的案例，请调整搜索条件</p>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle"></h2>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const CASES = [
+  {
+    id: 1,
+    company: "Meta Platforms (Facebook)",
+    fineAmount: 1200000000,
+    fineDisplay: "12 亿欧元",
+    currency: "EUR",
+    regulatorCountry: "爱尔兰",
+    regulatorBody: "DPC（爱尔兰数据保护委员会）",
+    date: "2023-05-22",
+    destination: "美国",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第44条、第46条",
+    industry: "社交媒体",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "在 Schrems II 判决废止「隐私盾」框架后，Meta 继续依赖标准合同条款（SCCs）将欧盟用户的个人数据传输至美国总部处理，未能证明美国法律环境能提供与欧盟「实质等同」的保护水平。",
+    dataFlow: "欧盟用户个人数据 → 美国 Meta 服务器",
+    dataTypes: "用户注册信息、社交互动数据、行为数据",
+    remedy: "要求 Meta 在5个月内停止向美国传输欧盟用户数据，并在6个月内使已传输的数据合规或删除。",
+    appealStatus: "Meta 已提起上诉。此后欧盟与美国建立了新的「数据隐私框架」（DPF），Meta 已在新框架下重新获得传输合法性。",
+    chinaInsight: "此案确立了 Schrems II 后对美国数据传输的执法标准。中国企业需注意：中国同样不在欧盟充分性认定名单中，PIPL 下的政府数据访问权可能面临类似质疑。",
+    sourceUrl: "https://www.edpb.europa.eu/news/news/2023/12-billion-euro-fine-facebook-result-edpb-binding-decision_en",
+    sourceName: "EDPB"
+  },
+  {
+    id: 2,
+    company: "TikTok (字节跳动)",
+    fineAmount: 530000000,
+    fineDisplay: "5.3 亿欧元",
+    currency: "EUR",
+    regulatorCountry: "爱尔兰",
+    regulatorBody: "DPC（爱尔兰数据保护委员会）",
+    date: "2025-04-30",
+    destination: "中国",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第44条、第46条",
+    industry: "社交媒体/短视频",
+    status: "上诉中",
+    riskLevel: "高",
+    violation: "TikTok 将欧盟/欧洲经济区用户的个人数据传输至中国境内的服务器进行处理，违反了 GDPR 对向第三国传输数据的限制规定。DPC 认定 TikTok 未能证明中国政府无法访问这些数据。",
+    dataFlow: "欧盟用户个人数据 → 中国境内服务器",
+    dataTypes: "用户账户信息、内容偏好数据、设备信息",
+    remedy: "罚款5.3亿欧元（其中4.85亿欧元因非法传输，4500万欧元因透明性不足）。要求在6个月内使数据传输合规，否则必须暂停向中国传输数据。",
+    appealStatus: "TikTok 已向爱尔兰高等法院提起上诉。2025年11月高等法院批准暂缓执行数据传输暂停令。2026年4月30日爱尔兰最高法院驳回 DPC 的上诉请求，确认 TikTok 可在上诉期间继续进行数据传输。",
+    chinaInsight: "此案是首个因向中国传输数据而被处以大额罚款的案例，对所有将欧盟用户数据传输至中国的企业（包括阿里系、腾讯系等）具有直接参考意义。表明欧盟监管机构已将中国视为与美国类似的「高风险目的地」。",
+    sourceUrl: "https://www.dataprotection.ie/en/news-media/latest-news/irish-data-protection-commission-fines-tiktok-eu530-million-and-orders-corrective-measures-following",
+    sourceName: "DPC Ireland"
+  },
+  {
+    id: 3,
+    company: "Uber",
+    fineAmount: 290000000,
+    fineDisplay: "2.9 亿欧元",
+    currency: "EUR",
+    regulatorCountry: "荷兰",
+    regulatorBody: "AP（荷兰数据保护局）",
+    date: "2024-08-26",
+    destination: "美国",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第44条",
+    industry: "出行/网约车",
+    status: "上诉中",
+    riskLevel: "高",
+    violation: "Uber 在超过两年时间内，将欧洲出租车和网约车司机的个人敏感数据（包括位置数据、身份证件、犯罪记录等）传输至美国总部，在隐私盾失效后未采取有效替代保障措施。",
+    dataFlow: "欧盟司机个人数据 → 美国 Uber 总部",
+    dataTypes: "司机账户信息、驾照、犯罪记录、位置数据、收入信息",
+    remedy: "要求立即确保数据传输合规，采取有效技术和组织措施。",
+    appealStatus: "Uber 已就罚款决定提起上诉。Uber 表示在欧盟-美国数据隐私框架（DPF）生效后，其传输已有合法基础。",
+    chinaInsight: "此案对出行领域的中国出海企业（如滴滴国际化业务）具有直接警示意义。司机数据属于敏感个人数据，跨境传输面临更高的合规要求。",
+    sourceUrl: "https://www.edpb.europa.eu/news/news/2024/dutch-sa-imposes-fine-290-million-euro-uber-because-transfers-drivers-data-us_en",
+    sourceName: "EDPB"
+  },
+  {
+    id: 4,
+    company: "Yango / MLU B.V. (Yandex)",
+    fineAmount: 100000000,
+    fineDisplay: "1 亿欧元",
+    currency: "EUR",
+    regulatorCountry: "荷兰",
+    regulatorBody: "AP（荷兰数据保护局），联合芬兰、挪威 DPA",
+    date: "2026-05-08",
+    destination: "俄罗斯",
+    origin: "芬兰、挪威",
+    legalBasis: "GDPR 第44条、第46条",
+    industry: "出行/网约车",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "Yango（俄罗斯Yandex旗下的国际打车应用）的欧洲运营实体 MLU B.V. 将芬兰和挪威用户的个人数据传输至俄罗斯进行处理，且无法证明俄罗斯国家机构（如FSB）无法访问这些数据。SCCs在俄罗斯法律环境下无法提供有效保障。",
+    dataFlow: "芬兰/挪威用户出行数据 → 俄罗斯服务器",
+    dataTypes: "乘客姓名、联系方式、位置数据、支付信息、出行记录",
+    remedy: "罚款1亿欧元，并命令立即停止向俄罗斯传输个人数据。",
+    appealStatus: "裁决刚发布（2026年5月8日），上诉情况待定。",
+    chinaInsight: "与TikTok案逻辑一致：当数据流向被欧盟认为存在政府大规模监控能力的第三国时，企业几乎无法证明SCCs能提供有效保障。中国企业面临同样的举证困境。",
+    sourceUrl: "https://captaincompliance.com/news/yango-hit-with-e100-million-fine-for-routing-european-user-data-to-russia/",
+    sourceName: "Captain Compliance"
+  },
+  {
+    id: 5,
+    company: "Clearview AI",
+    fineAmount: 20000000,
+    fineDisplay: "2000 万欧元",
+    currency: "EUR",
+    regulatorCountry: "意大利",
+    regulatorBody: "Garante（意大利数据保护局）",
+    date: "2022-03-09",
+    destination: "美国",
+    origin: "意大利/欧盟",
+    legalBasis: "GDPR 第5条、第6条、第9条、第14条、第15条、第27条",
+    industry: "人工智能/人脸识别",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "Clearview AI 未经同意抓取意大利公民公开互联网照片，构建超过100亿张人脸图像的生物识别数据库，并将数据传输至美国服务器处理。未向数据主体提供信息通知，未设立欧盟代表。",
+    dataFlow: "欧盟公民人脸图像 → 美国 Clearview AI 服务器",
+    dataTypes: "人脸生物识别数据、公开照片、关联元数据",
+    remedy: "罚款2000万欧元，禁止进一步收集和处理意大利数据主体的数据，要求删除已收集的数据，并指定欧盟代表。",
+    appealStatus: "Clearview AI 在意大利的上诉被驳回。",
+    chinaInsight: "人脸识别和生物识别数据属于GDPR下的特殊类别数据，跨境传输面临最严格的限制。中国AI企业如果在欧盟收集或处理生物识别数据并传回国内，将面临极高的合规风险。",
+    sourceUrl: "https://www.edpb.europa.eu/news/national-news/2022/facial-recognition-italian-sa-fines-clearview-ai-eur-20-million_en",
+    sourceName: "EDPB"
+  },
+  {
+    id: 6,
+    company: "Clearview AI",
+    fineAmount: 20000000,
+    fineDisplay: "2000 万欧元",
+    currency: "EUR",
+    regulatorCountry: "法国",
+    regulatorBody: "CNIL（法国数据保护局）",
+    date: "2022-10-20",
+    destination: "美国",
+    origin: "法国/欧盟",
+    legalBasis: "GDPR 第6条、第14条、第15条",
+    industry: "人工智能/人脸识别",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "与意大利案类似，CNIL认定 Clearview AI 非法收集和处理法国公民的人脸生物识别数据，在没有合法基础的情况下将数据传输至美国。此外，Clearview AI 未遵守CNIL此前的执行命令。",
+    dataFlow: "法国公民人脸图像 → 美国 Clearview AI 服务器",
+    dataTypes: "人脸生物识别数据、公开照片",
+    remedy: "罚款2000万欧元，要求停止数据收集和处理，两个月内删除所有法国公民数据。因未遵守执行令，额外处以每日10万欧元延迟罚款。",
+    appealStatus: "已执行。",
+    chinaInsight: "CNIL的执法表明，即使企业在欧盟没有实体存在，只要处理了欧盟公民的数据，GDPR即适用。中国AI企业如旷视、商汤等需关注域外管辖风险。",
+    sourceUrl: "https://www.cnil.fr/en/facial-recognition-cnil-orders-clearview-ai-comply-its-formal-notice",
+    sourceName: "CNIL"
+  },
+  {
+    id: 7,
+    company: "Clearview AI",
+    fineAmount: 30500000,
+    fineDisplay: "3050 万欧元",
+    currency: "EUR",
+    regulatorCountry: "荷兰",
+    regulatorBody: "AP（荷兰数据保护局）",
+    date: "2024-09-03",
+    destination: "美国",
+    origin: "荷兰/欧盟",
+    legalBasis: "GDPR 第5条、第6条、第9条、第14条、第27条",
+    industry: "人工智能/人脸识别",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "荷兰DPA认定 Clearview AI 建立非法的人脸识别数据库，处理荷兰公民的生物识别数据且无合法基础，并将数据传输至美国。荷兰DPA还认为Clearview AI的高管可能承担个人责任。",
+    dataFlow: "荷兰公民人脸图像 → 美国 Clearview AI 服务器",
+    dataTypes: "人脸生物识别数据、公开照片、唯一生物识别模板",
+    remedy: "罚款3050万欧元。警告若继续违反，将面临额外最高510万欧元的处罚。",
+    appealStatus: "已执行，Clearview AI 继续运营但未在欧盟合规。",
+    chinaInsight: "荷兰DPA提出企业高管可能承担个人责任的观点值得关注，这对中国出海企业的管理层有警示意义。",
+    sourceUrl: "https://www.hunton.com/privacy-and-cybersecurity-law-blog/dutch-regulator-fines-clearview-ai-30-5-million-euros",
+    sourceName: "Hunton Privacy Blog"
+  },
+  {
+    id: 8,
+    company: "Clearview AI",
+    fineAmount: 20000000,
+    fineDisplay: "2000 万欧元",
+    currency: "EUR",
+    regulatorCountry: "希腊",
+    regulatorBody: "HDPA（希腊数据保护局）",
+    date: "2022-07-13",
+    destination: "美国",
+    origin: "希腊/欧盟",
+    legalBasis: "GDPR 第5条、第6条、第9条、第14条",
+    industry: "人工智能/人脸识别",
+    status: "已执行",
+    riskLevel: "高",
+    violation: "希腊DPA认定 Clearview AI 非法处理希腊数据主体的生物识别数据，无合法基础且未履行信息告知义务，数据被传输至美国。",
+    dataFlow: "希腊公民人脸图像 → 美国 Clearview AI 服务器",
+    dataTypes: "人脸生物识别数据",
+    remedy: "罚款2000万欧元，要求停止收集和处理希腊公民数据并删除已有数据。",
+    appealStatus: "已执行。",
+    chinaInsight: "四国联合对同一企业的执法行动表明，欧盟各国DPA在跨境数据传输问题上正形成协调执法态势，企业不能寄希望于监管套利。",
+    sourceUrl: "https://privacyinternational.org/legal-action/challenge-against-clearview-ai-europe",
+    sourceName: "Privacy International"
+  },
+  {
+    id: 9,
+    company: "Dagens Industri (使用Google Analytics)",
+    fineAmount: 1100000,
+    fineDisplay: "110 万欧元",
+    currency: "EUR",
+    regulatorCountry: "瑞典",
+    regulatorBody: "IMY（瑞典数据保护局）",
+    date: "2023-06-30",
+    destination: "美国",
+    origin: "瑞典",
+    legalBasis: "GDPR 第46条",
+    industry: "媒体",
+    status: "已执行",
+    riskLevel: "中",
+    violation: "瑞典商业媒体 Dagens Industri 在网站上使用 Google Analytics，导致网站访问者的个人数据被传输至 Google 位于美国的服务器，违反 GDPR 跨境数据传输规定。",
+    dataFlow: "瑞典网站用户浏览数据 → 美国 Google 服务器",
+    dataTypes: "IP地址、Cookie标识符、网页浏览行为数据",
+    remedy: "罚款110万欧元，要求停止使用 Google Analytics 或确保合规。",
+    appealStatus: "已执行。",
+    chinaInsight: "Google Analytics 系列案件表明，即使企业并非直接发起数据传输，使用第三方工具导致的间接传输同样需要承担责任。中国出海企业在欧洲网站上使用的各类分析工具、SDK均需合规审查。",
+    sourceUrl: "https://www.edpb.europa.eu/system/files/2023-10/se_2023-06_decisionpublic_redacted.pdf",
+    sourceName: "EDPB / IMY"
+  },
+  {
+    id: 10,
+    company: "CNIL 针对多家网站 (Google Analytics)",
+    fineAmount: 0,
+    fineDisplay: "执行令（未罚款）",
+    currency: "EUR",
+    regulatorCountry: "法国",
+    regulatorBody: "CNIL（法国数据保护局）",
+    date: "2022-02-10",
+    destination: "美国",
+    origin: "法国",
+    legalBasis: "GDPR 第44条、第46条",
+    industry: "互联网/电商",
+    status: "已执行",
+    riskLevel: "中",
+    violation: "CNIL 认定多家法国网站使用 Google Analytics 构成向美国的非法数据传输。在 Schrems II 判决下，Google 的 SCCs 和补充措施不足以防止美国情报机构访问数据。",
+    dataFlow: "法国网站用户数据 → 美国 Google 服务器",
+    dataTypes: "IP地址、Cookie数据、浏览行为",
+    remedy: "要求相关网站在一个月内停止使用 Google Analytics 或使数据传输合规。",
+    appealStatus: "已执行，部分网站已切换至欧盟本地分析工具。",
+    chinaInsight: "即使是免费工具的使用也可能导致合规风险。中国出海企业需全面审计其在欧洲业务中使用的第三方技术服务和SDK，确认是否存在向非充分性国家传输数据的情况。",
+    sourceUrl: "https://www.cnil.fr/en/use-google-analytics-and-data-transfers-united-states-cnil-orders-website-manageroperator-comply",
+    sourceName: "CNIL"
+  },
+  {
+    id: 11,
+    company: "奥地利网站 (Google Analytics)",
+    fineAmount: 0,
+    fineDisplay: "裁定违规（未罚款）",
+    currency: "EUR",
+    regulatorCountry: "奥地利",
+    regulatorBody: "DSB（奥地利数据保护局）",
+    date: "2022-01-13",
+    destination: "美国",
+    origin: "奥地利",
+    legalBasis: "GDPR 第44条",
+    industry: "互联网",
+    status: "已执行",
+    riskLevel: "中",
+    violation: "NOYB 投诉引发。奥地利 DSB 裁定某网站使用 Google Analytics 构成向美国的非法数据传输，这是 Schrems II 判决后欧盟首个针对 Google Analytics 的正式裁定。",
+    dataFlow: "奥地利网站用户数据 → 美国 Google 服务器",
+    dataTypes: "在线标识符、IP地址、浏览器参数、网页交互数据",
+    remedy: "裁定使用 Google Analytics 违反 GDPR，要求停止使用。",
+    appealStatus: "已执行，成为后续多国类似裁定的先例。",
+    chinaInsight: "奥地利案是 Schrems II 后的里程碑裁定，直接推动了法国、意大利、瑞典等多国的连锁反应。对中国企业的启示是：一个国家的裁定往往会在整个欧盟产生多米诺效应。",
+    sourceUrl: "https://noyb.eu/en/austrian-dsb-eu-us-data-transfers-google-analytics-illegal",
+    sourceName: "NOYB"
+  },
+  {
+    id: 12,
+    company: "克罗地亚电信运营商",
+    fineAmount: 4500000,
+    fineDisplay: "450 万欧元",
+    currency: "EUR",
+    regulatorCountry: "克罗地亚",
+    regulatorBody: "AZOP（克罗地亚数据保护局）",
+    date: "2025-11-14",
+    destination: "集团内第三国",
+    origin: "克罗地亚",
+    legalBasis: "GDPR 第44条、第46条",
+    industry: "电信",
+    status: "已执行",
+    riskLevel: "中",
+    violation: "某克罗地亚电信运营商在集团内部将用户数据传输至欧盟以外的国家，使用的标准合同条款（SCCs）未及时更新至新版（2021年版），且缺乏传输影响评估（TIA）。",
+    dataFlow: "克罗地亚用户数据 → 集团关联公司（第三国）",
+    dataTypes: "电信用户个人信息、通信元数据",
+    remedy: "罚款450万欧元，要求更新SCCs至新版本并完成传输影响评估。",
+    appealStatus: "已执行。",
+    chinaInsight: "此案提醒企业：仅签署SCCs是不够的，必须使用最新版本，并完成传输影响评估（TIA）。中国企业集团内的数据共享同样受GDPR管辖。",
+    sourceUrl: "https://azop.hr/administrative-fine-of-eur-4-5-million-imposed-on-a-telecommunications-operator-14-november-2025/",
+    sourceName: "AZOP Croatia"
+  },
+  {
+    id: 13,
+    company: "欧盟委员会",
+    fineAmount: 400,
+    fineDisplay: "400 欧元（象征性）",
+    currency: "EUR",
+    regulatorCountry: "欧盟",
+    regulatorBody: "EUDPR（欧盟数据保护裁判机构）",
+    date: "2024-03-08",
+    destination: "美国",
+    origin: "欧盟",
+    legalBasis: "EUDPR 第46条（欧盟机构数据保护条例）",
+    industry: "政府机构",
+    status: "已执行",
+    riskLevel: "低",
+    violation: "欧盟委员会官方网站使用 Meta 登录功能，导致访问者的个人数据被传输至美国，违反了欧盟机构自身的数据保护条例。这是欧盟机构首次因数据跨境传输被处罚。",
+    dataFlow: "欧委会网站访问者数据 → 美国 Meta 服务器",
+    dataTypes: "IP地址、登录标识符",
+    remedy: "罚款400欧元（象征性），要求删除相关登录组件。",
+    appealStatus: "已执行。",
+    chinaInsight: "此案虽然罚款金额极小，但象征意义重大：连欧盟委员会自身都因向美国传输数据被裁定违规，表明跨境数据传输的合规标准适用于所有主体，无一例外。",
+    sourceUrl: "https://www.steptoe.com/en/news-publications/steptechtoe-blog/european-commission-fined-for-unlawful-transfer-of-personal-data-to-the-united-states.html",
+    sourceName: "Steptoe LLP"
+  },
+  {
+    id: 14,
+    company: "TikTok / AliExpress / SHEIN / Temu / WeChat / 小米",
+    fineAmount: 0,
+    fineDisplay: "投诉阶段（待审）",
+    currency: "EUR",
+    regulatorCountry: "奥地利/比利时/希腊/意大利/荷兰",
+    regulatorBody: "多国 DPA（由NOYB发起投诉）",
+    date: "2025-01-27",
+    destination: "中国",
+    origin: "欧盟",
+    legalBasis: "GDPR 第15条（访问权）、第44-46条（跨境传输）",
+    industry: "社交媒体/电商/通信/消费电子",
+    status: "投诉待审",
+    riskLevel: "高",
+    violation: "NOYB 向5个欧盟国家的 DPA 提交投诉，指控6家中国科技公司违反 GDPR：未能在法定期限内回应数据主体访问请求，且将欧盟用户数据传输至中国。涉及企业包括 TikTok、AliExpress（阿里速卖通）、SHEIN、Temu、WeChat（腾讯微信）及小米。",
+    dataFlow: "欧盟用户个人数据 → 中国境内服务器",
+    dataTypes: "用户账户信息、购物记录、通信内容、设备信息等",
+    remedy: "投诉要求各国DPA对相关企业展开调查并采取执法行动。",
+    appealStatus: "各国DPA正在审查投诉，尚未作出正式决定。",
+    chinaInsight: "这是迄今为止针对中国企业最大规模的GDPR集体投诉行动。一旦各国DPA正式立案调查，可能引发连锁处罚。所有在欧盟运营的中国企业均应立即审视其数据传输实践和数据主体请求响应机制。",
+    sourceUrl: "https://noyb.eu/en/tiktok-aliexpress-shein-co-surrender-europeans-data-authoritarian-china",
+    sourceName: "NOYB"
+  },
+  {
+    id: 15,
+    company: "AliExpress / TikTok / WeChat",
+    fineAmount: 0,
+    fineDisplay: "投诉阶段（待审）",
+    currency: "EUR",
+    regulatorCountry: "奥地利/比利时/荷兰",
+    regulatorBody: "多国 DPA（由NOYB发起投诉）",
+    date: "2025-07-17",
+    destination: "中国",
+    origin: "欧盟",
+    legalBasis: "GDPR 第15条（访问权）",
+    industry: "电商/社交媒体/通信",
+    status: "投诉待审",
+    riskLevel: "高",
+    violation: "NOYB 提交第二轮投诉，指控 AliExpress、TikTok 和 WeChat 在用户行使 GDPR 数据访问权时，拒绝提供完整的个人数据副本，或提供不完整/无法使用的数据，违反 GDPR 第15条。",
+    dataFlow: "欧盟用户个人数据 → 中国境内处理",
+    dataTypes: "用户账户信息、行为数据、交易记录等",
+    remedy: "投诉要求 DPA 强制相关企业完整响应数据主体访问请求。",
+    appealStatus: "各国DPA审查中。",
+    chinaInsight: "此案反映出中国企业在处理欧盟数据主体权利请求方面存在系统性缺陷。建议出海企业建立完善的数据主体请求响应流程（DSAR），确保在法定期限（通常30天）内提供完整回复。",
+    sourceUrl: "https://noyb.eu/en/how-tiktok-aliexpress-wechat-ignore-your-gdpr-rights",
+    sourceName: "NOYB"
+  },
+  {
+    id: 16,
+    company: "SHEIN（爱尔兰实体）",
+    fineAmount: 0,
+    fineDisplay: "调查中（未罚款）",
+    currency: "EUR",
+    regulatorCountry: "爱尔兰",
+    regulatorBody: "DPC（爱尔兰数据保护委员会）",
+    date: "2026-05-05",
+    destination: "中国",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第44-46条",
+    industry: "电商/快时尚",
+    status: "调查中",
+    riskLevel: "高",
+    violation: "爱尔兰 DPC 正式对 SHEIN 爱尔兰实体启动调查，审查其将欧盟用户个人数据传输至中国的合规性。调查将评估SHEIN所依赖的跨境传输机制是否符合GDPR要求。",
+    dataFlow: "欧盟消费者个人数据 → 中国境内服务器",
+    dataTypes: "购物信息、支付数据、个人账户信息",
+    remedy: "调查进行中，尚未作出处罚决定。",
+    appealStatus: "调查阶段。",
+    chinaInsight: "继TikTok之后，SHEIN成为第二家被DPC正式立案调查数据向中国传输的中国企业。这表明DPC正系统性地审查中国企业的数据传输实践，预计后续可能有更多中国企业被调查。",
+    sourceUrl: "https://www.reuters.com/sustainability/boards-policy-regulation/irish-data-protection-agency-launches-inquiry-into-shein-ireland-2026-05-05/",
+    sourceName: "Reuters"
+  },
+  {
+    id: 17,
+    company: "TikTok（儿童数据案）",
+    fineAmount: 345000000,
+    fineDisplay: "3.45 亿欧元",
+    currency: "EUR",
+    regulatorCountry: "爱尔兰",
+    regulatorBody: "DPC（爱尔兰数据保护委员会）",
+    date: "2023-09-15",
+    destination: "中国（间接涉及）",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第5条、第12条、第13条、第24条、第25条、第28条",
+    industry: "社交媒体/短视频",
+    status: "上诉中",
+    riskLevel: "高",
+    violation: "DPC认定TikTok在处理13-17岁儿童用户数据时存在多项违规：默认公开儿童账户设置、家庭配对功能缺陷、年龄验证不充分、透明度不足。虽然核心违规不直接涉及跨境传输条款，但涉及的数据最终流向中国处理。",
+    dataFlow: "欧盟儿童用户数据 → TikTok 全球基础设施（含中国）",
+    dataTypes: "儿童用户账户信息、内容、行为数据",
+    remedy: "罚款3.45亿欧元，要求在3个月内完成合规整改。",
+    appealStatus: "TikTok已上诉。",
+    chinaInsight: "儿童数据是GDPR下保护力度最强的类别之一。中国出海的教育科技、社交娱乐等涉及未成年人数据的企业需特别关注。",
+    sourceUrl: "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-conclusion-childrens-privacy-investigation",
+    sourceName: "DPC Ireland"
+  },
+  {
+    id: 18,
+    company: "TikTok（DSA合规案）",
+    fineAmount: 0,
+    fineDisplay: "初步认定违规（待最终裁决）",
+    currency: "EUR",
+    regulatorCountry: "欧盟",
+    regulatorBody: "欧盟委员会（DSA执法）",
+    date: "2026-02-06",
+    destination: "不适用（DSA合规问题）",
+    origin: "欧盟",
+    legalBasis: "数字服务法（DSA）",
+    industry: "社交媒体/短视频",
+    status: "调查中",
+    riskLevel: "高",
+    violation: "欧盟委员会初步认定TikTok的「成瘾性设计」违反DSA相关条款，包括推荐算法缺乏透明度、对未成年人保护措施不足等。虽非直接的数据传输案件，但涉及数据处理和算法透明度问题。",
+    dataFlow: "不适用（平台合规问题）",
+    dataTypes: "用户行为数据、推荐算法相关数据",
+    remedy: "若最终认定违规，罚款可达TikTok全球年营收的6%。",
+    appealStatus: "初步认定阶段，TikTok有权答辩。",
+    chinaInsight: "DSA对大型在线平台（VLOP）施加了额外的合规义务，包括算法透明度、系统性风险评估等。中国出海平台企业（如TikTok、SHEIN、Temu等）作为VLOP需关注DSA的执法趋势。",
+    sourceUrl: "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_312",
+    sourceName: "European Commission"
+  },
+  {
+    id: 19,
+    company: "Twitter / X Corp",
+    fineAmount: 450000,
+    fineDisplay: "45 万欧元",
+    currency: "EUR",
+    regulatorCountry: "爱尔兰",
+    regulatorBody: "DPC（爱尔兰数据保护委员会）",
+    date: "2021-12-15",
+    destination: "美国",
+    origin: "欧盟/欧洲经济区",
+    legalBasis: "GDPR 第33条（数据泄露通知）",
+    industry: "社交媒体",
+    status: "已执行",
+    riskLevel: "低",
+    violation: "Twitter 未在发现数据泄露后72小时内通知 DPC，部分泄露数据被传输至美国。虽然核心违规是未及时通知，但案件背景涉及跨境数据传输场景。",
+    dataFlow: "欧盟用户数据 → 美国 Twitter 服务器",
+    dataTypes: "用户推文、个人资料",
+    remedy: "罚款45万欧元。",
+    appealStatus: "已执行。",
+    chinaInsight: "数据泄露事件中的跨境传输因素可能加重处罚。中国出海企业需确保建立跨时区的数据泄露响应机制。",
+    sourceUrl: "https://www.dataprotection.ie/en/news-media/press-releases/data-protection-commission-announces-decision-twitter-inquiry",
+    sourceName: "DPC Ireland"
+  },
+  {
+    id: 20,
+    company: "Criteo",
+    fineAmount: 40000000,
+    fineDisplay: "4000 万欧元",
+    currency: "EUR",
+    regulatorCountry: "法国",
+    regulatorBody: "CNIL（法国数据保护局）",
+    date: "2023-06-15",
+    destination: "多国（含美国）",
+    origin: "法国/欧盟",
+    legalBasis: "GDPR 第7条、第15条、第17条、第26条",
+    industry: "广告科技",
+    status: "上诉中",
+    riskLevel: "中",
+    violation: "Criteo（法国广告科技公司）在未获有效同意的情况下收集和处理大量用户数据用于定向广告，涉及数据的跨境传输至多个国家的广告合作伙伴。",
+    dataFlow: "法国/欧盟用户浏览行为数据 → 全球广告网络",
+    dataTypes: "Cookie数据、浏览历史、广告偏好、设备标识符",
+    remedy: "罚款4000万欧元，要求改善同意获取机制。",
+    appealStatus: "Criteo 已提起上诉。",
+    chinaInsight: "广告科技领域的数据跨境传输风险常被忽视。中国出海的广告平台和电商企业通过广告SDK收集和传输的用户行为数据同样面临GDPR审查。",
+    sourceUrl: "https://www.cnil.fr/en/personalised-advertising-cnil-fines-criteo-eur-40-million",
+    sourceName: "CNIL"
+  }
+];
+
+// ============= Application Logic =============
+let currentSort = 'date';
+let sortAsc = false;
+
+function formatFineForSort(amount) { return amount; }
+
+function getFineCssClass(amount) {
+  if (amount >= 100000000) return 'fine-high';
+  if (amount >= 1000000) return 'fine-mid';
+  return 'fine-low';
+}
+
+function getStatusTagClass(status) {
+  const map = { '已执行': 'tag-status-closed', '上诉中': 'tag-status-appealing', '调查中': 'tag-status-investigating', '投诉待审': 'tag-status-pending' };
+  return map[status] || 'tag-status-pending';
+}
+
+function getRiskTagClass(level) {
+  const map = { '高': 'tag-risk-high', '中': 'tag-risk-mid', '低': 'tag-risk-low' };
+  return map[level] || 'tag-risk-mid';
+}
+
+function populateFilters() {
+  const dests = [...new Set(CASES.map(c => c.destination))].sort();
+  const regs = [...new Set(CASES.map(c => c.regulatorCountry))].sort();
+  const industries = [...new Set(CASES.map(c => c.industry))].sort();
+  const destSel = document.getElementById('filterDest');
+  const regSel = document.getElementById('filterRegulator');
+  const indSel = document.getElementById('filterIndustry');
+  dests.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; destSel.appendChild(o); });
+  regs.forEach(r => { const o = document.createElement('option'); o.value = r; o.textContent = r; regSel.appendChild(o); });
+  industries.forEach(i => { const o = document.createElement('option'); o.value = i; o.textContent = i; indSel.appendChild(o); });
+}
+
+function getFilteredCases() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const dest = document.getElementById('filterDest').value;
+  const reg = document.getElementById('filterRegulator').value;
+  const status = document.getElementById('filterStatus').value;
+  const risk = document.getElementById('filterRisk').value;
+  const ind = document.getElementById('filterIndustry').value;
+
+  let filtered = CASES.filter(c => {
+    if (query && !(c.company.toLowerCase().includes(query) || c.violation.toLowerCase().includes(query) || c.destination.toLowerCase().includes(query) || c.regulatorCountry.toLowerCase().includes(query) || c.industry.toLowerCase().includes(query) || c.regulatorBody.toLowerCase().includes(query) || c.chinaInsight.toLowerCase().includes(query))) return false;
+    if (dest && c.destination !== dest) return false;
+    if (reg && c.regulatorCountry !== reg) return false;
+    if (status && c.status !== status) return false;
+    if (risk && c.riskLevel !== risk) return false;
+    if (ind && c.industry !== ind) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    let va, vb;
+    if (currentSort === 'date') { va = a.date; vb = b.date; }
+    else if (currentSort === 'fine') { va = a.fineAmount; vb = b.fineAmount; }
+    else { va = a.company.toLowerCase(); vb = b.company.toLowerCase(); }
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+  return filtered;
+}
+
+function renderStats() {
+  const totalCases = CASES.length;
+  const totalFine = CASES.reduce((s, c) => s + c.fineAmount, 0);
+  const countries = new Set(CASES.map(c => c.regulatorCountry)).size;
+  const companies = new Set(CASES.map(c => c.company)).size;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-item"><div class="stat-number">${totalCases}</div><div class="stat-label">收录案例</div></div>
+    <div class="stat-item"><div class="stat-number">&euro;${(totalFine / 1e9).toFixed(2)}B</div><div class="stat-label">累计罚款</div></div>
+    <div class="stat-item"><div class="stat-number">${countries}</div><div class="stat-label">涉及国家/地区</div></div>
+    <div class="stat-item"><div class="stat-number">${companies}</div><div class="stat-label">涉事企业</div></div>
+  `;
+}
+
+function renderCards(cases) {
+  const container = document.getElementById('cardsContainer');
+  const noResults = document.getElementById('noResults');
+  document.getElementById('resultCount').textContent = `共 ${cases.length} 条结果`;
+  if (!cases.length) { container.innerHTML = ''; noResults.style.display = 'block'; return; }
+  noResults.style.display = 'none';
+  container.innerHTML = cases.map(c => `
+    <div class="card" onclick="openModal(${c.id})">
+      <div class="card-top">
+        <span class="card-company">${c.company}</span>
+        <span class="card-fine ${getFineCssClass(c.fineAmount)}">${c.fineDisplay}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-meta">
+          <span class="tag tag-country">${c.regulatorCountry}</span>
+          <span class="tag tag-dest">→ ${c.destination}</span>
+          <span class="tag ${getStatusTagClass(c.status)}">${c.status}</span>
+          <span class="tag ${getRiskTagClass(c.riskLevel)}">风险：${c.riskLevel}</span>
+          <span class="tag tag-industry">${c.industry}</span>
+        </div>
+        <div class="card-desc">${c.violation}</div>
+      </div>
+      <div class="card-footer">
+        <span class="card-date">${c.date}</span>
+        <span class="card-link"><a href="${c.sourceUrl}" target="_blank" onclick="event.stopPropagation();">${c.sourceName}</a></span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(id) {
+  const c = CASES.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('modalTitle').textContent = c.company;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="detail-section">
+      <h3>基础信息</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><label>涉事企业</label><span>${c.company}</span></div>
+        <div class="detail-item"><label>罚款金额</label><span class="${getFineCssClass(c.fineAmount)}" style="font-weight:700;font-size:18px;">${c.fineDisplay}</span></div>
+        <div class="detail-item"><label>监管机构</label><span>${c.regulatorBody}</span></div>
+        <div class="detail-item"><label>监管国家</label><span>${c.regulatorCountry}</span></div>
+        <div class="detail-item"><label>处罚日期</label><span>${c.date}</span></div>
+        <div class="detail-item"><label>法律依据</label><span>${c.legalBasis}</span></div>
+        <div class="detail-item"><label>所属行业</label><span>${c.industry}</span></div>
+        <div class="detail-item"><label>当前状态</label><span>${c.status}</span></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>数据流向</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><label>数据来源</label><span>${c.origin}</span></div>
+        <div class="detail-item"><label>传输目的地</label><span style="color:var(--danger);font-weight:600;">${c.destination}</span></div>
+      </div>
+      <div style="margin-top:8px;"><label style="font-size:12px;color:var(--text-secondary);">数据流向描述</label><p class="detail-text">${c.dataFlow}</p></div>
+      <div style="margin-top:8px;"><label style="font-size:12px;color:var(--text-secondary);">涉及数据类型</label><p class="detail-text">${c.dataTypes}</p></div>
+    </div>
+    <div class="detail-section">
+      <h3>违规行为</h3>
+      <p class="detail-text">${c.violation}</p>
+    </div>
+    <div class="detail-section">
+      <h3>整改要求</h3>
+      <p class="detail-text">${c.remedy}</p>
+    </div>
+    <div class="detail-section">
+      <h3>上诉与后续</h3>
+      <p class="detail-text">${c.appealStatus}</p>
+    </div>
+    <div class="detail-section">
+      <h3>对中国出海企业的启示</h3>
+      <div class="insight-box">${c.chinaInsight}</div>
+    </div>
+    <div class="detail-section">
+      <h3>信息来源</h3>
+      <p class="detail-text"><a href="${c.sourceUrl}" target="_blank" style="color:var(--primary);text-decoration:none;">${c.sourceName} — 查看原文</a></p>
+    </div>
+    <div class="detail-tags">
+      <span class="tag tag-country">${c.regulatorCountry}</span>
+      <span class="tag tag-dest">→ ${c.destination}</span>
+      <span class="tag ${getStatusTagClass(c.status)}">${c.status}</span>
+      <span class="tag ${getRiskTagClass(c.riskLevel)}">风险：${c.riskLevel}</span>
+      <span class="tag tag-industry">${c.industry}</span>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function refresh() { renderCards(getFilteredCases()); }
+
+// Event listeners
+document.getElementById('searchInput').addEventListener('input', refresh);
+document.getElementById('filterDest').addEventListener('change', refresh);
+document.getElementById('filterRegulator').addEventListener('change', refresh);
+document.getElementById('filterStatus').addEventListener('change', refresh);
+document.getElementById('filterRisk').addEventListener('change', refresh);
+document.getElementById('filterIndustry').addEventListener('change', refresh);
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sort = btn.dataset.sort;
+    if (currentSort === sort) { sortAsc = !sortAsc; }
+    else { currentSort = sort; sortAsc = sort === 'company'; }
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    refresh();
+  });
+});
+
+// Init
+populateFilters();
+renderStats();
+refresh();
+</script>
+</body>
+</html>
